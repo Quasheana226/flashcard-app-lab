@@ -1,5 +1,6 @@
 /* ========================================
-   BMW Flashcard App - Database & State Management
+   BMW Flashcard App - Complete Implementation
+   Database, State Management, Event Listeners
    ======================================== */
 
 /* ========================================
@@ -77,16 +78,6 @@ const appState = {
   currentDeck: [...flashcardsDatabase.all],
   darkMode: localStorage.getItem('bmw-flashcard-theme') === 'dark' || false,
   
-  // Initialize from localStorage if available
-  init() {
-    const savedTheme = localStorage.getItem('bmw-flashcard-theme');
-    if (savedTheme === 'dark') {
-      this.darkMode = true;
-      document.documentElement.setAttribute('data-theme', 'dark');
-    }
-  },
-  
-  // Update current deck based on category
   setCategory(category) {
     this.currentCategory = category;
     if (category === 'all') {
@@ -98,12 +89,10 @@ const appState = {
     this.isFlipped = false;
   },
   
-  // Get current card
   getCurrentCard() {
     return this.currentDeck[this.currentCardIndex];
   },
   
-  // Navigate to next card
   nextCard() {
     if (this.currentCardIndex < this.currentDeck.length - 1) {
       this.currentCardIndex++;
@@ -113,7 +102,6 @@ const appState = {
     return false;
   },
   
-  // Navigate to previous card
   previousCard() {
     if (this.currentCardIndex > 0) {
       this.currentCardIndex--;
@@ -123,26 +111,22 @@ const appState = {
     return false;
   },
   
-  // Toggle card flip
   toggleFlip() {
     this.isFlipped = !this.isFlipped;
   },
   
-  // Start quiz
   startQuiz() {
     this.isQuizStarted = true;
     this.currentCardIndex = 0;
     this.isFlipped = false;
   },
   
-  // Reset quiz
   resetQuiz() {
     this.isQuizStarted = false;
     this.currentCardIndex = 0;
     this.isFlipped = false;
   },
   
-  // Toggle dark mode
   toggleDarkMode() {
     this.darkMode = !this.darkMode;
     localStorage.setItem('bmw-flashcard-theme', this.darkMode ? 'dark' : 'light');
@@ -154,7 +138,6 @@ const appState = {
     }
   },
   
-  // Get progress percentage
   getProgress() {
     if (this.currentDeck.length === 0) return 0;
     return Math.round(((this.currentCardIndex + 1) / this.currentDeck.length) * 100);
@@ -162,197 +145,290 @@ const appState = {
 };
 
 /* ========================================
-   3. THEME MANAGER
+   3. DOM ELEMENTS OBJECT
    ======================================== */
 
-class ThemeManager {
-  constructor() {
+const elements = {
+  // Buttons
+  startBtn: null,
+  flipBtn: null,
+  resetBtn: null,
+  prevBtn: null,
+  nextBtn: null,
+  themeToggle: null,
+  categoryBtns: [],
+  
+  // Card Elements
+  flashcard: null,
+  cardQuestion: null,
+  cardAnswer: null,
+  
+  // Stats Elements
+  currentCard: null,
+  totalCards: null,
+  progressFill: null,
+  
+  // Other Elements
+  statusMessage: null,
+  themeIcon: null,
+  
+  // Initialize all DOM references
+  init() {
+    // Buttons
+    this.startBtn = document.getElementById('startBtn');
+    this.flipBtn = document.getElementById('flipBtn');
+    this.resetBtn = document.getElementById('resetBtn');
+    this.prevBtn = document.getElementById('prevBtn');
+    this.nextBtn = document.getElementById('nextBtn');
     this.themeToggle = document.getElementById('themeToggle');
-    this.init();
-  }
-
-  init() {
-    appState.init();
+    this.categoryBtns = Array.from(document.querySelectorAll('.category-btn'));
     
-    if (this.themeToggle) {
-      this.themeToggle.addEventListener('click', () => this.toggleTheme());
-      this.updateToggleState();
-    }
+    // Card Elements
+    this.flashcard = document.getElementById('flashcard');
+    this.cardQuestion = document.getElementById('cardQuestion');
+    this.cardAnswer = document.getElementById('cardAnswer');
+    
+    // Stats Elements
+    this.currentCard = document.getElementById('currentCard');
+    this.totalCards = document.getElementById('totalCards');
+    this.progressFill = document.querySelector('.progress-fill');
+    
+    // Other Elements
+    this.statusMessage = document.getElementById('statusMessage');
+    this.themeIcon = document.querySelector('.theme-icon');
   }
+};
 
-  toggleTheme() {
-    appState.toggleDarkMode();
-    this.updateToggleState();
+/* ========================================
+   4. EVENT LISTENERS SETUP
+   ======================================== */
+
+function setupEventListeners() {
+  // Button Click Listeners
+  if (elements.startBtn) {
+    elements.startBtn.addEventListener('click', () => handleStartQuiz());
   }
+  
+  if (elements.flipBtn) {
+    elements.flipBtn.addEventListener('click', () => handleFlipCard());
+  }
+  
+  if (elements.resetBtn) {
+    elements.resetBtn.addEventListener('click', () => handleResetQuiz());
+  }
+  
+  if (elements.prevBtn) {
+    elements.prevBtn.addEventListener('click', () => handlePreviousCard());
+  }
+  
+  if (elements.nextBtn) {
+    elements.nextBtn.addEventListener('click', () => handleNextCard());
+  }
+  
+  if (elements.themeToggle) {
+    elements.themeToggle.addEventListener('click', () => handleToggleTheme());
+  }
+  
+  // Flashcard Click Listener
+  if (elements.flashcard) {
+    elements.flashcard.addEventListener('click', () => handleFlipCard());
+  }
+  
+  // Category Button Listeners
+  elements.categoryBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => handleSelectCategory(e.target));
+  });
+  
+  // Keyboard Listener
+  document.addEventListener('keydown', (e) => handleKeyPress(e));
+}
 
-  updateToggleState() {
-    if (this.themeToggle) {
-      const isDark = appState.darkMode;
-      this.themeToggle.setAttribute('aria-pressed', isDark);
-      
-      const icon = this.themeToggle.querySelector('.theme-icon');
-      if (icon) {
-      }        icon.textContent = ' : 'isDark ? '
-    }
+/* ========================================
+   5. EVENT HANDLERS
+   ======================================== */
+
+function handleStartQuiz() {
+  appState.startQuiz();
+  updateDisplay();
+  showStatus('Quiz started! Click the card to flip it.');
+}
+
+function handleFlipCard() {
+  if (!appState.isQuizStarted) return;
+  appState.toggleFlip();
+  updateCardDisplay();
+}
+
+function handleResetQuiz() {
+  appState.resetQuiz();
+  updateDisplay();
+  showStatus('Quiz reset. Click "Start Quiz" to begin!');
+}
+
+function handleNextCard() {
+  if (appState.nextCard()) {
+    updateDisplay();
+  }
+}
+
+function handlePreviousCard() {
+  if (appState.previousCard()) {
+    updateDisplay();
+  }
+}
+
+function handleSelectCategory(btn) {
+  elements.categoryBtns.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const category = btn.dataset.category || 'all';
+  appState.setCategory(category);
+  updateDisplay();
+  showStatus(`Category: ${btn.textContent} (${appState.currentDeck.length} cards)`);
+}
+
+function handleToggleTheme() {
+  appState.toggleDarkMode();
+  updateThemeToggle();
+}
+
+function handleKeyPress(e) {
+  if (!appState.isQuizStarted) return;
+
+  switch (e.code) {
+    case 'Space':
+      e.preventDefault();
+      handleFlipCard();
+      break;
+    case 'ArrowRight':
+      handleNextCard();
+      break;
+    case 'ArrowLeft':
+      handlePreviousCard();
+      break;
   }
 }
 
 /* ========================================
-   4. FLASHCARD APP
+   6. DISPLAY UPDATE FUNCTIONS
    ======================================== */
 
-class FlashcardApp {
-  constructor() {
-    this.init();
+function updateDisplay() {
+  updateButtonStates();
+  updateCardDisplay();
+  updateStats();
+}
+
+function updateCardDisplay() {
+  const card = appState.getCurrentCard();
+  if (!card) return;
+
+  if (elements.cardQuestion) {
+    elements.cardQuestion.textContent = card.question;
+  }
+  
+  if (elements.cardAnswer) {
+    elements.cardAnswer.textContent = card.answer;
   }
 
-  init() {
-    this.attachEventListeners();
-    this.updateDisplay();
-  }
-
-  attachEventListeners() {
-    document.getElementById('startBtn')?.addEventListener('click', () => this.startQuiz());
-    document.getElementById('flipBtn')?.addEventListener('click', () => this.flipCard());
-    document.getElementById('resetBtn')?.addEventListener('click', () => this.resetQuiz());
-    document.getElementById('prevBtn')?.addEventListener('click', () => this.previousCard());
-    document.getElementById('nextBtn')?.addEventListener('click', () => this.nextCard());
-    
-    document.querySelectorAll('.category-btn')?.forEach(btn => {
-      btn.addEventListener('click', (e) => this.selectCategory(e.target));
-    });
-    
-    document.getElementById('flashcard')?.addEventListener('click', () => this.flipCard());
-    document.addEventListener('keydown', (e) => this.handleKeyboard(e));
-  }
-
-  startQuiz() {
-    appState.startQuiz();
-    this.updateDisplay();
-    this.showStatus('Quiz started! Click the card to flip it.');
-  }
-
-  flipCard() {
-    if (!appState.isQuizStarted) return;
-    appState.toggleFlip();
-    this.updateCardDisplay();
-  }
-
-  nextCard() {
-    if (appState.nextCard()) {
-      this.updateDisplay();
-    }
-  }
-
-  previousCard() {
-    if (appState.previousCard()) {
-      this.updateDisplay();
-    }
-  }
-
-  selectCategory(btn) {
-    document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
-    const category = btn.dataset.category || 'all';
-    appState.setCategory(category);
-    this.updateDisplay();
-    this.showStatus(`Category: ${btn.textContent} (${appState.currentDeck.length} cards)`);
-  }
-
-  resetQuiz() {
-    appState.resetQuiz();
-    this.updateDisplay();
-    this.showStatus('Quiz reset. Click "Start Quiz" to begin!');
-  }
-
-  updateDisplay() {
-    this.updateButtonStates();
-    this.updateCardDisplay();
-    this.updateStats();
-  }
-
-  updateCardDisplay() {
-    const card = appState.getCurrentCard();
-    if (!card) return;
-
-    document.getElementById('cardQuestion').textContent = card.question;
-    document.getElementById('cardAnswer').textContent = card.answer;
-
-    const flashcard = document.getElementById('flashcard');
-    if (flashcard) {
-      if (appState.isFlipped) {
-        flashcard.classList.add('flipped');
-      } else {
-        flashcard.classList.remove('flipped');
-      }
-    }
-  }
-
-  updateStats() {
-    const currentEl = document.getElementById('currentCard');
-    const totalEl = document.getElementById('totalCards');
-    const progressFill = document.querySelector('.progress-fill');
-
-    if (currentEl) currentEl.textContent = appState.isQuizStarted ? appState.currentCardIndex + 1 : 1;
-    if (totalEl) totalEl.textContent = appState.currentDeck.length;
-
-    if (progressFill) {
-      const progress = appState.getProgress();
-      progressFill.style.width = (appState.isQuizStarted ? progress : 0) + '%';
-    }
-  }
-
-  updateButtonStates() {
-    const startBtn = document.getElementById('startBtn');
-    const flipBtn = document.getElementById('flipBtn');
-    const resetBtn = document.getElementById('resetBtn');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-
-    if (startBtn) startBtn.disabled = appState.isQuizStarted;
-    if (flipBtn) flipBtn.disabled = !appState.isQuizStarted;
-    if (resetBtn) resetBtn.disabled = !appState.isQuizStarted;
-    if (prevBtn) prevBtn.disabled = !appState.isQuizStarted || appState.currentCardIndex === 0;
-    if (nextBtn) nextBtn.disabled = !appState.isQuizStarted || appState.currentCardIndex === appState.currentDeck.length - 1;
-  }
-
-  handleKeyboard(e) {
-    if (!appState.isQuizStarted) return;
-
-    switch (e.code) {
-      case 'Space':
-        e.preventDefault();
-        this.flipCard();
-        break;
-      case 'ArrowRight':
-        this.nextCard();
-        break;
-      case 'ArrowLeft':
-        this.previousCard();
-        break;
-    }
-  }
-
-  showStatus(message) {
-    const statusDiv = document.getElementById('statusMessage');
-    if (statusDiv) {
-      statusDiv.textContent = message;
-      statusDiv.classList.add('success');
-      
-      setTimeout(() => {
-        statusDiv.textContent = '';
-        statusDiv.classList.remove('success');
-      }, 3000);
+  if (elements.flashcard) {
+    if (appState.isFlipped) {
+      elements.flashcard.classList.add('flipped');
+    } else {
+      elements.flashcard.classList.remove('flipped');
     }
   }
 }
 
+function updateStats() {
+  if (elements.currentCard) {
+    elements.currentCard.textContent = appState.isQuizStarted ? appState.currentCardIndex + 1 : 1;
+  }
+  
+  if (elements.totalCards) {
+    elements.totalCards.textContent = appState.currentDeck.length;
+  }
+
+  if (elements.progressFill) {
+    const progress = appState.getProgress();
+    elements.progressFill.style.width = (appState.isQuizStarted ? progress : 0) + '%';
+  }
+}
+
+function updateButtonStates() {
+  if (elements.startBtn) {
+    elements.startBtn.disabled = appState.isQuizStarted;
+  }
+  
+  if (elements.flipBtn) {
+    elements.flipBtn.disabled = !appState.isQuizStarted;
+  }
+  
+  if (elements.resetBtn) {
+    elements.resetBtn.disabled = !appState.isQuizStarted;
+  }
+  
+  if (elements.prevBtn) {
+    elements.prevBtn.disabled = !appState.isQuizStarted || appState.currentCardIndex === 0;
+  }
+  
+  if (elements.nextBtn) {
+    elements.nextBtn.disabled = !appState.isQuizStarted || appState.currentCardIndex === appState.currentDeck.length - 1;
+  }
+}
+
+function updateThemeToggle() {
+  if (elements.themeToggle) {
+    const isDark = appState.darkMode;
+    elements.themeToggle.setAttribute('aria-pressed', isDark);
+    
+    if (elements.themeIcon) {
+    }      elements.themeIcon.textContent = ' : 'isDark ? '
+  }
+}
+
+function showStatus(message) {
+  if (elements.statusMessage) {
+    elements.statusMessage.textContent = message;
+    elements.statusMessage.classList.add('success');
+    
+    setTimeout(() => {
+      elements.statusMessage.textContent = '';
+      elements.statusMessage.classList.remove('success');
+    }, 3000);
+  }
+}
+
 /* ========================================
-   5. INITIALIZE APP
+   7. INITIALIZATION FUNCTIONS
    ======================================== */
 
-document.addEventListener('DOMContentLoaded', () => {
-  new ThemeManager();
-  new FlashcardApp();
-});
+function initTheme() {
+  const savedTheme = localStorage.getItem('bmw-flashcard-theme');
+  if (savedTheme === 'dark') {
+    appState.darkMode = true;
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }
+  updateThemeToggle();
+}
+
+function init() {
+  // Initialize DOM element references
+  elements.init();
+  
+  // Setup all event listeners
+  setupEventListeners();
+  
+  // Initialize theme from localStorage
+  initTheme();
+  
+  // Update stats display
+  updateStats();
+}
+
+/* ========================================
+   8. APP STARTUP
+   ======================================== */
+
+// Initialize app when DOM is loaded
+document.addEventListener('DOMContentLoaded', init);
