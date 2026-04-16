@@ -324,16 +324,21 @@ function resetQuiz() {
 }
 
 /* ========================================
-   6. EVENT HANDLERS
+   6. FLIP CARD FUNCTIONALITY
    ======================================== */
 
-function handleStartQuiz() {
-  startQuiz();
-}
-
-function handleFlipCard() {
+function flipCard() {
+  // Return early if quiz not started
   if (!appState.isQuizStarted) return;
+  
+  // Get current card before toggling
+  const card = appState.getCurrentCard();
+  if (!card) return;
+  
+  // Toggle the flip state
   appState.toggleFlip();
+  
+  // Toggle the CSS class
   if (elements.flashcard) {
     if (appState.isFlipped) {
       elements.flashcard.classList.add('flipped');
@@ -341,7 +346,49 @@ function handleFlipCard() {
       elements.flashcard.classList.remove('flipped');
     }
   }
-  announceCard(appState.getCurrentCard());
+  
+  // Create announcement message based on flipped state
+  const announcement = appState.isFlipped 
+    ? `Answer: ${card.answer}`
+    : `Question: ${card.question}`;
+  
+  // Announce to screen readers
+  announce(announcement);
+}
+
+function announce(message) {
+  // Create new div element for accessibility announcement
+  const announcer = document.createElement('div');
+  
+  // Set ARIA attributes for screen readers
+  announcer.setAttribute('role', 'status');
+  announcer.setAttribute('aria-live', 'polite');
+  
+  // Add screen-reader-only class
+  announcer.className = 'sr-only';
+  
+  // Set the announcement message
+  announcer.textContent = message;
+  
+  // Append to document body
+  document.body.appendChild(announcer);
+  
+  // Remove element after 1000ms to avoid accumulation
+  setTimeout(() => {
+    announcer.remove();
+  }, 1000);
+}
+
+/* ========================================
+   7. EVENT HANDLERS
+   ======================================== */
+
+function handleStartQuiz() {
+  startQuiz();
+}
+
+function handleFlipCard() {
+  flipCard();
 }
 
 function handleResetQuiz() {
@@ -398,7 +445,7 @@ function handleKeyPress(e) {
 }
 
 /* ========================================
-   7. UI UPDATE HELPER FUNCTIONS
+   8. UI UPDATE HELPER FUNCTIONS
    ======================================== */
 
 function updateStatus(type, message) {
@@ -490,7 +537,7 @@ function announceCard(card) {
 }
 
 /* ========================================
-   8. INITIALIZATION FUNCTIONS
+   9. INITIALIZATION FUNCTIONS
    ======================================== */
 
 function initTheme() {
@@ -517,7 +564,7 @@ function init() {
 }
 
 /* ========================================
-   9. APP STARTUP
+   10. APP STARTUP
    ======================================== */
 
 // Initialize app when DOM is loaded
