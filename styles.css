@@ -156,3 +156,190 @@ body.dark-mode .theme-icon {
     }
 }
 
+
+/* ========================================
+   Button Controls & Navigation Styles
+   ======================================== */
+
+/* Status Message */
+#statusMessage {
+    min-height: 24px;
+    padding: var(--space-md);
+    text-align: center;
+    font-size: var(--text-sm);
+    color: var(--primary-color);
+    font-weight: var(--font-weight-medium);
+    transition: color var(--transition);
+}
+
+#statusMessage.success {
+    color: var(--success-color);
+}
+
+#statusMessage.error {
+    color: var(--danger-color);
+}
+
+/* Controls Section */
+.controls-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--border);
+}
+
+/* Controls Grid */
+.controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--space-md);
+    justify-items: stretch;
+}
+
+/* Navigation Buttons */
+.nav-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-md);
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+/* Button Base Styles */
+.btn {
+    padding: var(--space-sm) var(--space-md);
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    font-weight: var(--font-weight-semibold);
+    font-family: var(--font-family);
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-sm);
+    user-select: none;
+    line-height: 1.4;
+    min-height: 44px;
+    min-width: 44px;
+}
+
+.btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn:focus-visible {
+    outline: 2px solid var(--secondary-color);
+    outline-offset: 2px;
+}
+
+/* Button Disabled State */
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Primary Button */
+.btn-primary {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.btn-primary:active:not(:disabled) {
+    background-color: var(--primary-dark);
+}
+
+/* Secondary Button */
+.btn-secondary {
+    background-color: var(--surface-hover);
+    color: var(--text-primary);
+    border-color: var(--border);
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: var(--surface-active);
+    border-color: var(--primary-light);
+}
+
+.btn-secondary:active:not(:disabled) {
+    background-color: var(--surface-active);
+}
+
+/* Navigation Button */
+.btn-nav {
+    background-color: var(--background-alt);
+    color: var(--text-primary);
+    border-color: var(--border);
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-medium);
+}
+
+.btn-nav:hover:not(:disabled) {
+    background-color: var(--primary-light);
+    color: white;
+    border-color: var(--primary-light);
+}
+
+.btn-nav:active:not(:disabled) {
+    background-color: var(--primary-dark);
+}
+
+.btn-prev,
+.btn-next {
+    flex: 1;
+}
+
+/* Responsive Design for Controls */
+@media (max-width: 768px) {
+    .controls-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .nav-buttons {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .btn {
+        min-height: 40px;
+        font-size: var(--text-xs);
+        padding: var(--space-sm) var(--space-xs);
+    }
+}
+
+@media (max-width: 480px) {
+    .controls-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .nav-buttons {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    #statusMessage {
+        font-size: var(--text-xs);
+        padding: var(--space-sm);
+    }
+}
+
+/* Focus Visible Accessibility */
+:focus-visible {
+    outline: 2px solid var(--secondary-color);
+    outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+    outline: none;
+}

@@ -31,177 +31,121 @@
         </header>
     </nav>
 
-    <!-- Header (Original) -->
-    <header class="app-header" role="banner">
-        <div class="header-content">
-            <h1 class="app-title">FlashCards</h1>
-            <button 
-                id="newDeckBtn" 
-                class="btn btn-primary" 
-                aria-label="Create a new deck"
-                data-action="new-deck"
-            >
-                New Deck
-            </button>
-        </div>
-    </header>
-
-    <div class="app-container">
-        <!-- Sidebar Navigation -->
-        <nav class="sidebar" role="navigation" aria-label="Deck navigation">
-            <h2 class="sidebar-title">Decks</h2>
-            <ul class="deck-list" role="list" aria-label="Available decks">
-                <li role="listitem">
-                    <button 
-                        class="deck-item active" 
-                        data-deck-id="deck-1"
-                        aria-current="page"
-                        aria-label="Spanish Vocabulary"
-                    >
-                        Spanish Vocabulary
-                    </button>
-                </li>
-                <li role="listitem">
-                    <button 
-                        class="deck-item" 
-                        data-deck-id="deck-2"
-                        aria-label="French Phrases"
-                    >
-                        French Phrases
-                    </button>
-                </li>
-                <li role="listitem">
-                    <button 
-                        class="deck-item" 
-                        data-deck-id="deck-3"
-                        aria-label="Biology Terms"
-                    >
-                        Biology Terms
-                    </button>
-                </li>
-            </ul>
-        </nav>
-
-        <!-- Main Content -->
-        <main class="main-content" role="main">
-            <!-- Deck Header -->
-            <section class="deck-header" aria-labelledby="deckTitle">
-                <h2 id="deckTitle" class="deck-title">Spanish Vocabulary</h2>
-                <button 
-                    id="deleteDeckBtn" 
-                    class="btn btn-secondary btn-sm" 
-                    aria-label="Delete this deck"
-                    data-action="delete-deck"
-                >
-                    Delete Deck
-                </button>
-            </section>
-
-            <!-- Toolbar -->
-            <section class="toolbar" role="toolbar" aria-label="Deck controls">
-                <div class="toolbar-search">
-                    <input 
-                        type="text" 
-                        id="searchInput" 
-                        class="search-input" 
-                        placeholder="Search cards..."
-                        aria-label="Search cards in this deck"
-                        data-action="search-cards"
-                    >
+    <!-- Main Container -->
+    <main class="main-container">
+        <!-- Stats and Flashcard Section -->
+        <section class="app-section" aria-labelledby="stats-heading">
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <!-- Current Card Stat -->
+                <div class="stat-item">
+                    <span class="stat-label">Card</span>
+                    <span class="stat-value" id="currentCard">1</span>
                 </div>
-                <div class="toolbar-actions">
-                    <button 
-                        id="shuffleBtn" 
-                        class="btn btn-secondary" 
-                        aria-label="Shuffle cards"
-                        data-action="shuffle"
-                        title="Shuffle the deck"
-                    >
-                    </button>                        
-                    <button 
-                        id="newCardBtn" 
-                        class="btn btn-primary" 
-                        aria-label="Add a new card"
-                        data-action="new-card"
-                    >
-                        New Card
-                    </button>
-                </div>
-            </section>
 
-            <!-- Card Display Area -->
-            <section class="card-container" role="region" aria-labelledby="cardStatus">
-                <div class="card-wrapper">
-                    <div 
-                        class="card" 
-                        data-card-id="card-1"
-                        role="img"
-                        aria-label="Flashcard"
-                    >
-                        <div class="card-inner">
-                            <!-- Front of card -->
-                            <div class="card-face card-front" data-side="front">
-                                <p class="card-text">Hola</p>
-                                <span class="card-side-label">Front</span>
-                            </div>
-                            <!-- Back of card -->
-                            <div class="card-face card-back" data-side="back">
-                                <p class="card-text">Hello</p>
-                                <span class="card-side-label">Back</span>
-                            </div>
+                <!-- Divider -->
+                <div class="stat-divider"></div>
+
+                <!-- Total Cards Stat -->
+                <div class="stat-item">
+                    <span class="stat-label">Total</span>
+                    <span class="stat-value" id="totalCards">25</span>
+                </div>
+
+                <!-- Divider -->
+                <div class="stat-divider"></div>
+
+                <!-- Progress Stat -->
+                <div class="stat-item">
+                    <span class="stat-label">Progress</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 4%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flashcard Section -->
+            <section class="flashcard-section" aria-labelledby="card-heading">
+                <h2 id="card-heading" class="sr-only">Flashcard Display</h2>
+
+                <!-- Card Container -->
+                <div class="card-container">
+                    <div id="flashcard" class="flashcard" aria-label="Flashcard content - click to flip">
+                        <!-- Card Front -->
+                        <div class="card-front">
+                            <h2 id="cardQuestion">What is the engine block called in German?</h2>
+                            <p class="card-hint">Hint: Motor part</p>
+                        </div>
+
+                        <!-- Card Back -->
+                        <div class="card-back">
+                            <p id="cardAnswer">Motorblock</p>
                         </div>
                     </div>
                 </div>
-
-                <!-- Card Status -->
-                <p id="cardStatus" class="card-status" aria-live="polite">
-                    Card <span class="current-card">1</span> of <span class="total-cards">25</span>
-                </p>
             </section>
 
-            <!-- Controls -->
-            <section class="card-controls" role="group" aria-label="Card navigation and actions">
-                <div class="nav-controls">
+            <!-- Status Message -->
+            <div id="statusMessage" role="status" aria-live="polite" aria-atomic="true"></div>
+
+            <!-- Controls Section -->
+            <section class="controls-section" aria-labelledby="controls-heading">
+                <h2 id="controls-heading" class="sr-only">Quiz Controls</h2>
+
+                <!-- Main Action Buttons -->
+                <div class="controls-grid">
+                    <button 
+                        id="startBtn" 
+                        class="btn btn-primary" 
+                        aria-label="Start the quiz"
+                        type="button"
+                    >
+                        Start Quiz
+                    </button>
+                    <button 
+                        id="flipBtn" 
+                        class="btn btn-secondary" 
+                        aria-label="Flip the current flashcard"
+                        type="button"
+                        disabled
+                    >
+                        Flip Card
+                    </button>
+                    <button 
+                        id="resetBtn" 
+                        class="btn btn-secondary" 
+                        aria-label="Reset the quiz and start over"
+                        type="button"
+                        disabled
+                    >
+                        Reset
+                    </button>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="nav-buttons">
                     <button 
                         id="prevBtn" 
-                        class="btn btn-secondary" 
-                        aria-label="Previous card"
-                        data-action="prev-card"
+                        class="btn btn-nav btn-prev" 
+                        aria-label="Go to previous card"
+                        type="button"
+                        disabled
                     >
  Previous                        
                     </button>
                     <button 
-                        id="flipBtn" 
-                        class="btn btn-secondary btn-lg" 
-                        aria-label="Flip card"
-                        data-action="flip-card"
-                        title="Press SPACE to flip"
-                    >
-                        Flip
-                    </button>
-                    <button 
                         id="nextBtn" 
-                        class="btn btn-secondary" 
-                        aria-label="Next card"
-                        data-action="next-card"
+                        class="btn btn-nav btn-next" 
+                        aria-label="Go to next card"
+                        type="button"
+                        disabled
                     >
 
-                    </button>
-                </div>
-
-                <div class="card-actions">
-                    <button 
-                        id="deleteCardBtn" 
-                        class="btn btn-danger btn-sm" 
-                        aria-label="Delete this card"
-                        data-action="delete-card"
-                    >
-                        Delete Card
                     </button>
                 </div>
             </section>
-        </main>
-    </div>
+        </section>
+    </main>
 
     <!-- Footer -->
     <footer class="app-footer" role="contentinfo">
