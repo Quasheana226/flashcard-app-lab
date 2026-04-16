@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="FlashCards - Study with interactive flashcards"
+    />
+    <title>FlashCards</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="app-header" role="banner">
+      <div class="header-content">
+        <h1 class="app-title">FlashCards</h1>
+        <button
+          id="newDeckBtn"
+          class="btn btn-primary"
+          aria-label="Create a new deck"
+          data-action="new-deck"
+        >
+          New Deck
+        </button>
+      </div>
+    </header>
+
+    <div class="app-container">
+      <!-- Sidebar Navigation -->
+      <nav class="sidebar" role="navigation" aria-label="Deck navigation">
+        <h2 class="sidebar-title">Decks</h2>
+        <ul class="deck-list" role="list" aria-label="Available decks">
+          <li role="listitem">
+            <button
+              class="deck-item active"
+              data-deck-id="deck-1"
+              aria-current="page"
+              aria-label="Spanish Vocabulary"
+            >
+              Spanish Vocabulary
+            </button>
+          </li>
+          <li role="listitem">
+            <button
+              class="deck-item"
+              data-deck-id="deck-2"
+              aria-label="French Phrases"
+            >
+              French Phrases
+            </button>
+          </li>
+          <li role="listitem">
+            <button
+              class="deck-item"
+              data-deck-id="deck-3"
+              aria-label="Biology Terms"
+            >
+              Biology Terms
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- Main Content -->
+      <main class="main-content" role="main">
+        <!-- Deck Header -->
+        <section class="deck-header" aria-labelledby="deckTitle">
+          <h2 id="deckTitle" class="deck-title">Spanish Vocabulary</h2>
+          <button
+            id="deleteDeckBtn"
+            class="btn btn-secondary btn-sm"
+            aria-label="Delete this deck"
+            data-action="delete-deck"
+          >
+            Delete Deck
+          </button>
+        </section>
+
+        <!-- Toolbar -->
+        <section class="toolbar" role="toolbar" aria-label="Deck controls">
+          <div class="toolbar-search">
+            <input
+              type="text"
+              id="searchInput"
+              class="search-input"
+              placeholder="Search cards..."
+              aria-label="Search cards in this deck"
+              data-action="search-cards"
+            />
+          </div>
+          <div class="toolbar-actions">
+            <button
+              id="shuffleBtn"
+              class="btn btn-secondary"
+              aria-label="Shuffle cards"
+              data-action="shuffle"
+              title="Shuffle the deck"
+            >
+              🔀 Shuffle
+            </button>
+            <button
+              id="newCardBtn"
+              class="btn btn-primary"
+              aria-label="Add a new card"
+              data-action="new-card"
+            >
+              New Card
+            </button>
+          </div>
+        </section>
+
+        <!-- Card Display Area -->
+        <section
+          class="card-container"
+          role="region"
+          aria-labelledby="cardStatus"
+        >
+          <div class="card-wrapper">
+            <div
+              class="card"
+              data-card-id="card-1"
+              role="img"
+              aria-label="Flashcard"
+            >
+              <div class="card-inner">
+                <!-- Front of card -->
+                <div class="card-face card-front" data-side="front">
+                  <p class="card-text">Hola</p>
+                  <span class="card-side-label">Front</span>
+                </div>
+                <!-- Back of card -->
+                <div class="card-face card-back" data-side="back">
+                  <p class="card-text">Hello</p>
+                  <span class="card-side-label">Back</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card Status -->
+          <p id="cardStatus" class="card-status" aria-live="polite">
+            Card <span class="current-card">1</span> of
+            <span class="total-cards">25</span>
+          </p>
+        </section>
+
+        <!-- Controls -->
+        <section
+          class="card-controls"
+          role="group"
+          aria-label="Card navigation and actions"
+        >
+          <div class="nav-controls">
+            <button
+              id="prevBtn"
+              class="btn btn-secondary"
+              aria-label="Previous card"
+              data-action="prev-card"
+            >
+              ← Previous
+            </button>
+            <button
+              id="flipBtn"
+              class="btn btn-secondary btn-lg"
+              aria-label="Flip card"
+              data-action="flip-card"
+              title="Press SPACE to flip"
+            >
+              Flip
+            </button>
+            <button
+              id="nextBtn"
+              class="btn btn-secondary"
+              aria-label="Next card"
+              data-action="next-card"
+            >
+              Next →
+            </button>
+          </div>
+
+          <div class="card-actions">
+            <button
+              id="deleteCardBtn"
+              class="btn btn-danger btn-sm"
+              aria-label="Delete this card"
+              data-action="delete-card"
+            >
+              Delete Card
+            </button>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="app-footer" role="contentinfo">
+      <div class="footer-content">
+        <p class="instructions">
+          <strong>Keyboard shortcuts:</strong>
+          <span class="shortcut"><kbd>SPACE</kbd> to flip</span>
+          <span class="shortcut"><kbd>←</kbd> previous</span>
+          <span class="shortcut"><kbd>→</kbd> next</span>
+        </p>
+      </div>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>
