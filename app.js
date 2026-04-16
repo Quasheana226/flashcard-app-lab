@@ -1,6 +1,6 @@
 /* ========================================
    BMW Flashcard App - Complete Implementation
-   Database, State Management, Event Listeners
+   Database, State Management, Event Listeners, Quiz Functions
    ======================================== */
 
 /* ========================================
@@ -244,36 +244,119 @@ function setupEventListeners() {
 }
 
 /* ========================================
-   5. EVENT HANDLERS
+   5. QUIZ MANAGEMENT FUNCTIONS
+   ======================================== */
+
+function startQuiz() {
+  // Check if deck is empty
+  if (appState.currentDeck.length === 0) {
+    updateStatus('warning', 'No cards in this category. Please select another.');
+    return;
+  }
+  
+  // Initialize quiz state
+  appState.isQuizStarted = true;
+  appState.currentCardIndex = 0;
+  appState.isFlipped = false;
+  
+  // Update UI
+  updateQuizUI(true);
+  displayCard();
+  updateStatus('success', 'Quiz started! Click the card to flip it.');
+}
+
+function displayCard() {
+  // Return early if deck is empty
+  if (appState.currentDeck.length === 0) return;
+  
+  // Get current card
+  const card = appState.getCurrentCard();
+  if (!card) return;
+  
+  // Update card display
+  if (elements.cardQuestion) {
+    elements.cardQuestion.textContent = card.question;
+  }
+  
+  if (elements.cardAnswer) {
+    elements.cardAnswer.textContent = card.answer;
+  }
+  
+  // Remove flipped class
+  if (elements.flashcard) {
+    elements.flashcard.classList.remove('flipped');
+  }
+  
+  // Reset flip state
+  appState.isFlipped = false;
+  
+  // Update all UI elements
+  updateStats();
+  updateNavButtons();
+  announceCard(card);
+}
+
+function resetQuiz() {
+  // Reset all state
+  appState.currentCardIndex = 0;
+  appState.isFlipped = false;
+  appState.isQuizStarted = false;
+  
+  // Update UI
+  updateQuizUI(false);
+  
+  // Reset card display to defaults
+  if (elements.cardQuestion) {
+    elements.cardQuestion.textContent = 'Select a category and click "Start Quiz" to begin!';
+  }
+  
+  if (elements.cardAnswer) {
+    elements.cardAnswer.textContent = 'Your answer will appear here.';
+  }
+  
+  if (elements.flashcard) {
+    elements.flashcard.classList.remove('flipped');
+  }
+  
+  // Reset stats
+  updateStats();
+  updateStatus('success', 'Ready to learn! Select a category to get started.');
+}
+
+/* ========================================
+   6. EVENT HANDLERS
    ======================================== */
 
 function handleStartQuiz() {
-  appState.startQuiz();
-  updateDisplay();
-  showStatus('Quiz started! Click the card to flip it.');
+  startQuiz();
 }
 
 function handleFlipCard() {
   if (!appState.isQuizStarted) return;
   appState.toggleFlip();
-  updateCardDisplay();
+  if (elements.flashcard) {
+    if (appState.isFlipped) {
+      elements.flashcard.classList.add('flipped');
+    } else {
+      elements.flashcard.classList.remove('flipped');
+    }
+  }
+  announceCard(appState.getCurrentCard());
 }
 
 function handleResetQuiz() {
-  appState.resetQuiz();
-  updateDisplay();
-  showStatus('Quiz reset. Click "Start Quiz" to begin!');
+  resetQuiz();
 }
 
 function handleNextCard() {
   if (appState.nextCard()) {
-    updateDisplay();
+    displayCard();
   }
 }
 
 function handlePreviousCard() {
   if (appState.previousCard()) {
-    updateDisplay();
+    displayCard();
   }
 }
 
@@ -283,8 +366,13 @@ function handleSelectCategory(btn) {
   
   const category = btn.dataset.category || 'all';
   appState.setCategory(category);
-  updateDisplay();
-  showStatus(`Category: ${btn.textContent} (${appState.currentDeck.length} cards)`);
+  
+  // Reset quiz if it was active
+  if (appState.isQuizStarted) {
+    resetQuiz();
+  }
+  
+  updateStatus('success', `Category: ${btn.textContent} (${appState.currentDeck.length} cards)`);
 }
 
 function handleToggleTheme() {
@@ -310,39 +398,59 @@ function handleKeyPress(e) {
 }
 
 /* ========================================
-   6. DISPLAY UPDATE FUNCTIONS
+   7. UI UPDATE HELPER FUNCTIONS
    ======================================== */
 
-function updateDisplay() {
-  updateButtonStates();
-  updateCardDisplay();
-  updateStats();
+function updateStatus(type, message) {
+  if (!elements.statusMessage) return;
+  
+  elements.statusMessage.textContent = message;
+  elements.statusMessage.className = `status-message ${type}`;
+  
+  // Auto-clear after 3 seconds
+  setTimeout(() => {
+    if (elements.statusMessage) {
+      elements.statusMessage.textContent = '';
+      elements.statusMessage.className = 'status-message';
+    }
+  }, 3000);
 }
 
-function updateCardDisplay() {
-  const card = appState.getCurrentCard();
-  if (!card) return;
-
-  if (elements.cardQuestion) {
-    elements.cardQuestion.textContent = card.question;
+function updateQuizUI(isActive) {
+  if (elements.flipBtn) {
+    elements.flipBtn.disabled = !isActive;
   }
   
-  if (elements.cardAnswer) {
-    elements.cardAnswer.textContent = card.answer;
+  if (elements.resetBtn) {
+    elements.resetBtn.disabled = !isActive;
   }
+  
+  if (elements.startBtn) {
+    elements.startBtn.disabled = isActive;
+  }
+  
+  updateNavButtons();
+}
 
-  if (elements.flashcard) {
-    if (appState.isFlipped) {
-      elements.flashcard.classList.add('flipped');
-    } else {
-      elements.flashcard.classList.remove('flipped');
-    }
+function updateNavButtons() {
+  if (!appState.isQuizStarted) {
+    if (elements.prevBtn) elements.prevBtn.disabled = true;
+    if (elements.nextBtn) elements.nextBtn.disabled = true;
+    return;
+  }
+  
+  if (elements.prevBtn) {
+    elements.prevBtn.disabled = appState.currentCardIndex === 0;
+  }
+  
+  if (elements.nextBtn) {
+    elements.nextBtn.disabled = appState.currentCardIndex === appState.currentDeck.length - 1;
   }
 }
 
 function updateStats() {
   if (elements.currentCard) {
-    elements.currentCard.textContent = appState.isQuizStarted ? appState.currentCardIndex + 1 : 1;
+    elements.currentCard.textContent = appState.isQuizStarted ? appState.currentCardIndex + 1 : 0;
   }
   
   if (elements.totalCards) {
@@ -352,28 +460,6 @@ function updateStats() {
   if (elements.progressFill) {
     const progress = appState.getProgress();
     elements.progressFill.style.width = (appState.isQuizStarted ? progress : 0) + '%';
-  }
-}
-
-function updateButtonStates() {
-  if (elements.startBtn) {
-    elements.startBtn.disabled = appState.isQuizStarted;
-  }
-  
-  if (elements.flipBtn) {
-    elements.flipBtn.disabled = !appState.isQuizStarted;
-  }
-  
-  if (elements.resetBtn) {
-    elements.resetBtn.disabled = !appState.isQuizStarted;
-  }
-  
-  if (elements.prevBtn) {
-    elements.prevBtn.disabled = !appState.isQuizStarted || appState.currentCardIndex === 0;
-  }
-  
-  if (elements.nextBtn) {
-    elements.nextBtn.disabled = !appState.isQuizStarted || appState.currentCardIndex === appState.currentDeck.length - 1;
   }
 }
 
@@ -387,20 +473,24 @@ function updateThemeToggle() {
   }
 }
 
-function showStatus(message) {
+function announceCard(card) {
+  if (!card) return;
+  
+  // Create announcement for screen readers
+  const announcement = appState.isFlipped 
+    ? `Answer: ${card.answer}`
+    : `Question: ${card.question}. Card ${appState.currentCardIndex + 1} of ${appState.currentDeck.length}`;
+  
+  // Use aria-live region if available
   if (elements.statusMessage) {
-    elements.statusMessage.textContent = message;
-    elements.statusMessage.classList.add('success');
-    
-    setTimeout(() => {
-      elements.statusMessage.textContent = '';
-      elements.statusMessage.classList.remove('success');
-    }, 3000);
+    elements.statusMessage.setAttribute('role', 'status');
+    elements.statusMessage.setAttribute('aria-live', 'polite');
+    elements.statusMessage.textContent = announcement;
   }
 }
 
 /* ========================================
-   7. INITIALIZATION FUNCTIONS
+   8. INITIALIZATION FUNCTIONS
    ======================================== */
 
 function initTheme() {
@@ -427,7 +517,7 @@ function init() {
 }
 
 /* ========================================
-   8. APP STARTUP
+   9. APP STARTUP
    ======================================== */
 
 // Initialize app when DOM is loaded
