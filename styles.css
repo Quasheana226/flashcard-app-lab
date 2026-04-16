@@ -3,6 +3,11 @@
    ======================================== */
 
 /* BMW Navigation Container */
+
+:root{
+    --z-fixed: 1000;
+
+}
 nav {
     background-color: var(--surface);
     border-bottom: 2px solid var(--primary-color);
@@ -342,4 +347,172 @@ body.dark-mode .theme-icon {
 
 :focus:not(:focus-visible) {
     outline: none;
+}
+
+/* ========================================
+   Category Selection & Info Section Styles
+   ======================================== */
+
+/* Category Section */
+.category-section {
+    padding: var(--space-lg) 0;
+    border-top: 2px solid var(--border);
+}
+
+.category-section h2 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    text-align: center;
+}
+
+/* Category Grid */
+.category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--space-md);
+    margin-bottom: var(--space-2xl);
+}
+
+/* Category Button */
+.category-btn {
+    padding: var(--space-md) var(--space-lg);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-lg);
+    background-color: var(--surface-hover);
+    color: var(--text-primary);
+    font-size: var(--text-base);
+    font-weight: var(--font-weight-semibold);
+    font-family: var(--font-family);
+    cursor: pointer;
+    transition: var(--transition);
+    min-height: 50px;
+}
+
+.category-btn:hover {
+    border-color: var(--primary-light);
+    background-color: var(--background-alt);
+    transform: translateY(-2px);
+}
+
+.category-btn:focus-visible {
+    outline: 2px solid var(--secondary-color);
+    outline-offset: 2px;
+}
+
+.category-btn.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+    border-color: var(--primary-color);
+    font-weight: var(--font-weight-bold);
+    box-shadow: var(--shadow-lg);
+}
+
+.category-btn.active:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-xl);
+}
+
+/* Info Section */
+.info-section {
+    padding: var(--space-xl) 0;
+    border-top: 2px solid var(--border);
+}
+
+.info-section h2 {
+    font-size: var(--text-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin-bottom: var(--space-lg);
+    text-align: center;
+}
+
+/* Info Grid */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-lg);
+}
+
+/* Info Card */
+.info-card {
+    background-color: var(--background-alt);
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    border-left: 4px solid var(--primary-color);
+    transition: var(--transition);
+}
+
+.info-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+    border-left-color: var(--secondary-color);
+}
+
+.info-card h3 {
+    font-size: var(--text-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--primary-color);
+    margin-bottom: var(--space-md);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.info-card p {
+    font-size: var(--text-sm);
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Responsive Category Grid */
+@media (max-width: 768px) {
+    .category-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: var(--space-sm);
+    }
+
+    .category-btn {
+        padding: var(--space-sm) var(--space-md);
+        font-size: var(--text-sm);
+        min-height: 45px;
+    }
+
+    .category-section h2,
+    .info-section h2 {
+        font-size: var(--text-xl);
+        margin-bottom: var(--space-md);
+    }
+}
+
+@media (max-width: 480px) {
+    .category-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-sm);
+    }
+
+    .category-btn {
+        padding: var(--space-sm) var(--space-xs);
+        font-size: var(--text-xs);
+        min-height: 40px;
+    }
+
+    .info-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+    }
+
+    .info-card {
+        padding: var(--space-md);
+    }
+
+    .info-card h3 {
+        font-size: var(--text-base);
+    }
+
+    .info-card p {
+        font-size: var(--text-xs);
+    }
 }
