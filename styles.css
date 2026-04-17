@@ -53,9 +53,9 @@
 
   --font-size-sm: 0.875rem;
   --font-size-base: 1rem;
-  --font-size-lg: 1.125rem;
-  --font-size-xl: 1.25rem;
-  --font-size-2xl: 1.5rem;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
 
   /* ---- Transitions ---- */
   --transition-fast: all 150ms cubic-bezier(0.4, 0, 0.2, 1);
@@ -409,11 +409,17 @@ nav header {
   border-radius: 1.25rem;
   box-shadow: var(--shadow-lg);
   text-align: center;
-  transition: opacity var(--transition-base), transform var(--transition-base);
+  transition:
+    opacity var(--transition-base),
+    transform var(--transition-base);
 }
 
 .card-front {
-  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+  background: linear-gradient(
+    135deg,
+    var(--color-primary),
+    var(--color-primary-light)
+  );
   color: var(--text-inverse);
   opacity: 1;
   transform: rotateY(0deg);
