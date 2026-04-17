@@ -6,6 +6,8 @@
     <meta name="description" content="FlashCards - Study with interactive flashcards">
     <title>FlashCards</title>
     <link rel="stylesheet" href="styles.css">
+
+    <script src="app.js" defer></script>
 </head>
 <body>
     <!-- BMW Flashcard App Navigation -->
@@ -25,6 +27,7 @@
                         aria-pressed="false"
                         type="button"
                     >
+                    <span class="theme-icon">🌙</span>
                     </button>                        <span class="theme-icon">
                 </div>
             </div>
@@ -131,7 +134,7 @@
                         type="button"
                         disabled
                     >
- Previous                        
+                      Previous
                     </button>
                     <button 
                         id="nextBtn" 
@@ -236,12 +239,11 @@
             <p class="instructions">
                 <strong>Keyboard shortcuts:</strong> 
                 <span class="shortcut"><kbd>SPACE</kbd> to flip</span>
-                <span class="shortcut"><</kbd> previous</span>kbd>
-</kbd> next</span>
+                <span class="shortcut"><kbd>←</kbd> previous</span>
+                <span class="shortcut"><kbd>→</kbd> next</span>
             </p>
         </div>
     </footer>
 
-    <script src="app.js"></script>
 </body>
 </html>
